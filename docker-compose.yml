@@ -1,0 +1,74 @@
+version: '3'
+
+networks:
+  emf-symfony-example:
+
+services:
+  # nginx
+  nginx-service:
+    image: nginx:stable-alpine
+    container_name: nginx-container
+    ports:
+      - "80:80"
+    volumes:
+      - .:/var/www/project:cached
+      - ./docker/nginx/default.conf:/etc/nginx/conf.d/default.conf
+    depends_on:
+      - php81-service
+      - mariadb8-service
+    networks:
+      - emf_products_example
+
+  # php
+  php81-service:
+    build:
+      context: ./docker/php/
+      dockerfile: Dockerfile
+    links:
+      - redis-service
+    container_name: php81-container
+    ports:
+      - "9000:9000"
+    volumes:
+      - .:/var/www/project:cached
+    networks:
+      - emf_products_example
+
+  # mariadb
+  mariadb-service:
+    build:
+      context: ./docker/mariadb/
+      dockerfile: Dockerfile
+    container_name: mariadb-container
+    hostname: mariadb
+    ports:
+      - "3306:3306"
+    volumes:
+      - ~/docker/mariadb-emf_symfony_example_app:/var/lib/mysql
+    command: --default-authentication-plugin=mysql_native_password --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci
+    restart: always # always restart unless stopped manually
+    environment:
+      MYSQL_ROOT_PASSWORD: 'Password123!'
+      MYSQL_USER: 'emf_user'
+      MYSQL_PASSWORD: 'Password123'
+      MYSQL_DATABASE: 'emf_symfony_example_app'
+    networks:
+      - emf_products_example
+
+  redis-service:
+    image: redis:alpine
+    container_name: redis-container
+    networks:
+      - emf_products_example
+
+  adminer-service:
+    container_name: adminer-container
+    image: adminer
+    hostname: adminer
+    restart: always
+    ports:
+      - "8085:8080"
+    depends_on:
+      - mariadb-service
+    networks:
+      - emf_products_example
