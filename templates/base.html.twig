@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="{{ app.request.locale }}">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1"/>
+    <title>{% block title %}EMF Products example application{% endblock %}</title>
+
+    {#
+    Those two blocks defines frontend entrypoint for CSS and JavaScript assets
+    See https://symfony.com/doc/current/frontend.html
+    #}
+    {% block stylesheets %}
+        {{ encore_entry_link_tags('app') }}
+    {% endblock %}
+    {% block javascripts %}
+        {{ encore_entry_script_tags('app') }}
+    {% endblock %}
+
+    <link rel="icon" type="image/x-icon" href="{{ asset('favicon.ico') }}" />
+</head>
+
+<body id="{% block body_id %}{% endblock %}">
+
+{% block header %}
+    <header>
+        <div class="navbar navbar-default navbar-static-top" role="navigation">
+            <div class="container">
+                <div class="navbar-header col-md-3 col-lg-2">
+                    <a class="navbar-brand" href="{{ path('homepage') }}">
+                        Homepage
+                    </a>
+                </div>
+                <div class="navbar-collapse collapse">
+                    <ul class="nav navbar-nav navbar-right">
+                        <li>
+                            <a href="#"> <i class="fa fa-search"></i> {{ 'menu.search'|trans }}</a>
+                        </li>
+                        <li>
+                            <a href="#"> <i class="fa fa-search"></i> {{ 'menu.product.list'|trans }}</a>
+                        </li>
+                        <li>
+                            <a href="#"> <i class="fa fa-search"></i> {{ 'menu.search'|trans }}</a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </header>
+{% endblock %}
+
+<div class="container body-container">
+    {% block body %}
+        <div class="row">
+            <div id="main" class="col-sm-9">
+                {{ include('default/_flash_messages.html.twig') }}
+
+                {% block main %}{% endblock %}
+            </div>
+        </div>
+    {% endblock %}
+</div>
+
+{% block footer %}
+    <footer>
+        <div class="container">
+            <div class="row">
+                <div id="footer-copyright" class="col-md-6">
+                    <p>&copy; {{ 'now'|date('Y') }} - EMF Solutions</p>
+                </div>
+            </div>
+        </div>
+    </footer>
+{% endblock %}
+</body>
+</html>

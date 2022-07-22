@@ -1,7 +1,7 @@
 version: '3'
 
 networks:
-  emf-symfony-example:
+  emf_products_example:
 
 services:
   # nginx
@@ -44,14 +44,14 @@ services:
     ports:
       - "3306:3306"
     volumes:
-      - ~/docker/mariadb-emf_symfony_example_app:/var/lib/mysql
+      - ~/docker/mariadb-emf_products_example_app:/var/lib/mysql
     command: --default-authentication-plugin=mysql_native_password --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci
     restart: always # always restart unless stopped manually
     environment:
       MYSQL_ROOT_PASSWORD: 'Password123!'
       MYSQL_USER: 'emf_user'
       MYSQL_PASSWORD: 'Password123'
-      MYSQL_DATABASE: 'emf_symfony_example_app'
+      MYSQL_DATABASE: 'emf_products_example_app'
     networks:
       - emf_products_example
 
@@ -72,3 +72,22 @@ services:
       - mariadb-service
     networks:
       - emf_products_example
+
+###> doctrine/doctrine-bundle ###
+  database:
+    image: postgres:${POSTGRES_VERSION:-13}-alpine
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-app}
+      # You should definitely change the password in production
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-ChangeMe}
+      POSTGRES_USER: ${POSTGRES_USER:-symfony}
+    volumes:
+      - db-data:/var/lib/postgresql/data:rw
+      # You may use a bind-mounted host directory instead, so that it is harder to accidentally remove the volume and lose all your data!
+      # - ./docker/db/data:/var/lib/postgresql/data:rw
+###< doctrine/doctrine-bundle ###
+
+volumes:
+###> doctrine/doctrine-bundle ###
+  db-data:
+###< doctrine/doctrine-bundle ###

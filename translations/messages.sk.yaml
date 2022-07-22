@@ -1,0 +1,7 @@
+menu:
+    homepage: Hlavná stránka
+    product:
+        list: Zoznam produktov
+        search: Vyhľadať produkt
+        insert: Vložiť produkt
+sidebar: Bočný panel
