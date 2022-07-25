@@ -60,13 +60,9 @@ class Product
     private ?string $image3 = null;
 
     #[ORM\Column]
-    #[NotBlank]
-    #[DateTime]
     private ?\DateTimeImmutable $createdAt = null;
 
     #[ORM\Column]
-    #[NotBlank]
-    #[DateTime]
     private ?\DateTimeImmutable $updatedAt = null;
 
     #[

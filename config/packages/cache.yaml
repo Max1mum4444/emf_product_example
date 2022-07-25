@@ -9,8 +9,7 @@ framework:
 
         # Redis
         app: cache.adapter.redis
-        # TODO move to env
-        default_redis_provider: redis://redis-container:6379
+        default_redis_provider: '%env(REDIS_PROVIDER)%'
 
         # APCu (not recommended with heavy random-write workloads as memory fragmentation can cause perf issues)
         #app: cache.adapter.apcu
