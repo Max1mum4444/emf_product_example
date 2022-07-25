@@ -1,0 +1,5 @@
+# api/fixtures/category.yaml
+App\Entity\Category:
+    category_{1..10}:
+        title: <name()>
+        active: <boolean(35)>

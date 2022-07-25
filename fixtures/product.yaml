@@ -1,0 +1,9 @@
+# api/fixtures/product.yaml
+App\Entity\Product:
+    product_{1..100}:
+        title: <company()>
+        description: <text()>
+        image1: <imageUrl()>
+        image2: <imageUrl()>
+        image3: <imageUrl()>
+        category: '@category_*'

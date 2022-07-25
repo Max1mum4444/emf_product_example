@@ -12,19 +12,19 @@ SET @OLD_SQL_MODE = @@SQL_MODE, SQL_MODE =
 -- Schema mydb
 -- -----------------------------------------------------
 -- -----------------------------------------------------
--- Schema emf_products_example_app
+-- Schema emf_products_example_app_test
 -- -----------------------------------------------------
 
 -- -----------------------------------------------------
--- Schema emf_products_example_app
+-- Schema emf_products_example_app_test
 -- -----------------------------------------------------
-CREATE SCHEMA IF NOT EXISTS `emf_products_example_app` DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
-USE `emf_products_example_app`;
+CREATE SCHEMA IF NOT EXISTS `emf_products_example_app_test` DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+USE `emf_products_example_app_test`;
 
 -- -----------------------------------------------------
--- Table `emf_products_example_app`.`emf_category`
+-- Table `emf_products_example_app_test`.`emf_category`
 -- -----------------------------------------------------
-CREATE TABLE IF NOT EXISTS `emf_products_example_app`.`emf_category`
+CREATE TABLE IF NOT EXISTS `emf_products_example_app_test`.`emf_category`
 (
     `id`        INT UNSIGNED        NOT NULL AUTO_INCREMENT,
     `title`     VARCHAR(255)        NOT NULL,
@@ -34,7 +34,7 @@ CREATE TABLE IF NOT EXISTS `emf_products_example_app`.`emf_category`
     INDEX `fk_emf_category_emf_category1_idx` (`parent_id` ASC) VISIBLE,
     CONSTRAINT `fk_emf_category_emf_category1`
         FOREIGN KEY (`parent_id`)
-            REFERENCES `emf_products_example_app`.`emf_category` (`id`)
+            REFERENCES `emf_products_example_app_test`.`emf_category` (`id`)
             ON DELETE NO ACTION
             ON UPDATE NO ACTION
 )
@@ -42,9 +42,9 @@ CREATE TABLE IF NOT EXISTS `emf_products_example_app`.`emf_category`
 
 
 -- -----------------------------------------------------
--- Table `emf_products_example_app`.`emf_product`
+-- Table `emf_products_example_app_test`.`emf_product`
 -- -----------------------------------------------------
-CREATE TABLE IF NOT EXISTS `emf_products_example_app`.`emf_product`
+CREATE TABLE IF NOT EXISTS `emf_products_example_app_test`.`emf_product`
 (
     `id`              INT UNSIGNED   NOT NULL AUTO_INCREMENT,
     `title`           VARCHAR(255)   NOT NULL,
@@ -62,7 +62,7 @@ CREATE TABLE IF NOT EXISTS `emf_products_example_app`.`emf_product`
     INDEX `updated_at_idx` (`updated_at` ASC) VISIBLE,
     CONSTRAINT `fk_emf_product_emf_category`
         FOREIGN KEY (`emf_category_id`)
-            REFERENCES `emf_products_example_app`.`emf_category` (`id`)
+            REFERENCES `emf_products_example_app_test`.`emf_category` (`id`)
             ON DELETE NO ACTION
             ON UPDATE NO ACTION
 )

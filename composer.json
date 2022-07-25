@@ -91,9 +91,15 @@
         }
     },
     "require-dev": {
+        "hautelook/alice-bundle": "^2.11",
+        "justinrainbow/json-schema": "^5.2",
+        "phpunit/phpunit": "^9.5",
         "roave/security-advisories": "dev-latest",
+        "symfony/browser-kit": "6.1.*",
+        "symfony/css-selector": "6.1.*",
         "symfony/debug-bundle": "6.1.*",
         "symfony/maker-bundle": "^1.44",
+        "symfony/phpunit-bridge": "^6.1",
         "symfony/stopwatch": "6.1.*",
         "symfony/var-dumper": "6.1.*",
         "symfony/web-profiler-bundle": "6.1.*"
