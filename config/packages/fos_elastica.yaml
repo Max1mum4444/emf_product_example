@@ -3,4 +3,23 @@ fos_elastica:
     clients:
         default: { url: '%env(ELASTICSEARCH_URL)%' }
     indexes:
-        app: null
+        products:
+            persistence:
+                # the driver can be orm, mongodb or phpcr
+                identifier: id
+                driver: orm
+                model: App\Entity\Product
+                provider: ~
+                finder: ~
+                listener: ~
+                repository: App\Repository\ProductRepository
+            properties:
+                title: ~
+                description: ~
+                image_1: ~
+                image_2: ~
+                image_3: ~
+                price: ~
+                id: ~
+                updated_at: ~
+                created_at: ~

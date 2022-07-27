@@ -2,7 +2,7 @@
 
 namespace App\Controller;
 
-use App\Repository\ProductRepository;
+use App\Elastic\ProductFinder;
 use Psr\Log\LoggerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -11,7 +11,7 @@ use Symfony\Component\Routing\Annotation\Route;
 
 class ProductController extends AbstractController
 {
-    public function __construct(private readonly LoggerInterface $logger)
+    public function __construct(private readonly LoggerInterface $logger, private readonly ProductFinder $productFinder)
     {
     }
 
@@ -25,26 +25,24 @@ class ProductController extends AbstractController
     }
 
     #[Route('/product/{id}', name: 'product_detail')]
-    public function detail(int $id, ProductRepository $productRepository): Response
+    public function detail(int $id): Response
     {
         return $this->render('product/');
     }
 
     #[Route('/products', name: 'product_list')]
-    public function list(ProductRepository $productRepository): Response
+    public function list(): Response
     {
-        // Example of direct products getting
+        // EXAMPLE of direct products getting
 //        $products = $productRepository->findAllOrdered();
 
-        // Example of getting via api
-        $products = $productRepository->getAllProducts();
-//        $normalizerProducts = $this->normalizer->normalize($products);
-//        dd($products);
-//        foreach ($products as $product) {
-//            $product->getTitle();
-//        }
+        // EXAMPLE of getting via api
+//        $products = $productRepository->getAllProducts();
         //only for now to send it to twig
-        $products = $products['hydra:member'];
+//        $products = $products['hydra:member'];
+
+        //search by string
+        $products = $this->productFinder->searchProductsByText('iphone');
 
         return $this->render('product/list.html.twig', ['products' => $products]);
     }

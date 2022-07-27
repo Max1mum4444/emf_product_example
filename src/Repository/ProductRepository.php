@@ -5,6 +5,7 @@ namespace App\Repository;
 use App\Entity\Product;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
+use FOS\ElasticaBundle\Finder\PaginatedFinderInterface;
 use Psr\Cache\InvalidArgumentException;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpClient\HttpClient;
@@ -28,10 +29,10 @@ class ProductRepository extends ServiceEntityRepository
 
     public function __construct(
         ManagerRegistry $registry,
-        protected LoggerInterface $logger,
-        protected string $apiUrl,
-        protected CacheInterface $cache,
-        protected int $cacheTtl
+        private readonly LoggerInterface $logger,
+        private readonly string $apiUrl,
+        private readonly CacheInterface $cache,
+        private readonly int $cacheTtl,
 //        protected SerializerInterface $serializer
     )
     {
@@ -84,6 +85,7 @@ class ProductRepository extends ServiceEntityRepository
             });
         } catch (InvalidArgumentException $e) {
             $this->logger->error($e->getMessage());
+
             return [];
         }
     }

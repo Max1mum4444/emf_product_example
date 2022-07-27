@@ -35,3 +35,7 @@ services:
             - [ setConfig, [ '%table_prefix%' ] ]
         tags:
             - { name: doctrine.event_listener, event: loadClassMetadata, method: loadClassMetadata }
+
+    App\Elastic\ProductFinder:
+        arguments:
+            $finder: '@fos_elastica.finder.products'
