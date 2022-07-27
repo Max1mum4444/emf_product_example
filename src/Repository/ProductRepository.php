@@ -1,11 +1,13 @@
 <?php
+declare(strict_types=1);
 
 namespace App\Repository;
 
 use App\Entity\Product;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
-use FOS\ElasticaBundle\Finder\PaginatedFinderInterface;
+use Pagerfanta\Adapter\ArrayAdapter;
+use Pagerfanta\Pagerfanta;
 use Psr\Cache\InvalidArgumentException;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpClient\HttpClient;
@@ -25,6 +27,7 @@ class ProductRepository extends ServiceEntityRepository
     public const CACHE_LIFETIME = 3600;
     private const ENDPOINT = [
         'list' => '/api/products',
+        'detail' => '/api/products/%s',
     ];
 
     public function __construct(
@@ -33,6 +36,7 @@ class ProductRepository extends ServiceEntityRepository
         private readonly string $apiUrl,
         private readonly CacheInterface $cache,
         private readonly int $cacheTtl,
+        private readonly int $apiItemsPerPage
 //        protected SerializerInterface $serializer
     )
     {
@@ -71,17 +75,47 @@ class ProductRepository extends ServiceEntityRepository
     }
 
     // this should be moved in other app to process output from this app via client and api
-    public function getAllProducts(): array
+    public function getAllProducts($page = 1): Pagerfanta
     {
         //this should be in Repository of 2nd app
         $cacheTtl = $this->cacheTtl;
 
         try {
-            return $this->cache->get('all_products', function (ItemInterface $item) use ($cacheTtl) {
+            return $this->cache->get('all_products', function (ItemInterface $item) use ($cacheTtl, $page) {
+                $item->expiresAfter($cacheTtl);
+                $client = HttpClient::create();
+                $url = sprintf('%s%s%s', $this->apiUrl, static::ENDPOINT['list'], $page > 1 ? sprintf('?page=%s', $page) : '');
+                $response = $client->request('GET', $url);
+                $products = $response->toArray();
+                $adapter = new ArrayAdapter($products['hydra:member']);
+                $pagerfanta = new Pagerfanta($adapter);
+                $pagerfanta->setMaxPerPage($this->apiItemsPerPage);
+                $pagerfanta->setCurrentPage($page); // 1 by default
+
+                return $pagerfanta;
+            });
+        } catch (InvalidArgumentException $e) {
+            $this->logger->error($e->getMessage());
+
+            return new Pagerfanta(new ArrayAdapter([]));
+        }
+    }
+
+    // this should be moved in other app to process output from this app via client and api
+    public function getProductById(int $id): array
+    {
+        //this should be in Repository of 2nd app
+        $cacheTtl = $this->cacheTtl;
+        try {
+            $key = sprintf('product_%s', $id);
+
+            return $this->cache->get($key, function (ItemInterface $item) use ($cacheTtl, $id) {
                 $item->expiresAfter($cacheTtl);
                 $client = HttpClient::create();
 
-                return $client->request('GET', $this->apiUrl.static::ENDPOINT['list'])->toArray();
+                $url = sprintf('%s%s', $this->apiUrl, sprintf(static::ENDPOINT['detail'], $id));
+
+                return $client->request('GET', $url)->toArray();
             });
         } catch (InvalidArgumentException $e) {
             $this->logger->error($e->getMessage());
@@ -89,29 +123,4 @@ class ProductRepository extends ServiceEntityRepository
             return [];
         }
     }
-
-//    /**
-//     * @return Product[] Returns an array of Product objects
-//     */
-//    public function findByExampleField($value): array
-//    {
-//        return $this->createQueryBuilder('p')
-//            ->andWhere('p.exampleField = :val')
-//            ->setParameter('val', $value)
-//            ->orderBy('p.id', 'ASC')
-//            ->setMaxResults(10)
-//            ->getQuery()
-//            ->getResult()
-//        ;
-//    }
-
-//    public function findOneBySomeField($value): ?Product
-//    {
-//        return $this->createQueryBuilder('p')
-//            ->andWhere('p.exampleField = :val')
-//            ->setParameter('val', $value)
-//            ->getQuery()
-//            ->getOneOrNullResult()
-//        ;
-//    }
 }

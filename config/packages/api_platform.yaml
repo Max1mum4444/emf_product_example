@@ -7,4 +7,4 @@ api_platform:
         versions: [3]
     collection:
         pagination:
-            items_per_page: 25
+            items_per_page: '%env(int:API_ITEMS_PER_PAGE)%'

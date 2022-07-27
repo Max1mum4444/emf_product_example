@@ -14,4 +14,23 @@ add price unit to DB
 
 ## Elastic with mysql sync via logstash
 https://www.elastic.co/blog/how-to-keep-elasticsearch-synchronized-with-a-relational-database-using-logstash
+
 https://towardsdatascience.com/how-to-synchronize-elasticsearch-with-mysql-ed32fc57b339
+
+## URL Examples
+http://emf-products.localhost/
+
+http://emf-products.localhost/products
+
+http://emf-products.localhost/products/1
+
+http://emf-products.localhost/products?search=nechaj
+
+## RUN and install
+```console
+docker-compose up -d --build
+docker exec -it php81-container /bin/bash
+composer install 
+yarn install
+yarn build
+```

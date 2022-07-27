@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace App\Elastic;
 
@@ -12,7 +13,7 @@ class ProductFinder
     ) {
     }
 
-    public function searchProductsByText(string $searchString, int $page = 1, int $limit = 10): Pagerfanta
+    public function searchProductsByText(string $searchString, int $page = 1, int $limit = 25): Pagerfanta
     {
         $products = $this->finder->findPaginated($searchString);
         $products->setMaxPerPage($limit);
