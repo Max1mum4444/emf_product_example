@@ -74,16 +74,15 @@ services:
       - emf_products_example
 
   elasticsearch-service:
-    image: docker.elastic.co/elasticsearch/elasticsearch:8.3.2
-    container_name: elasticsearch-container
+    image: docker.elastic.co/elasticsearch/elasticsearch:7.9.3
+    container_name: elasticsearch
     # restart: on-failure
     ports:
       - "9200:9200"
     environment:
       - bootstrap.memory_lock=true
       - discovery.type=single-node
-      - cluster.routing.allocation.disk.threshold_enabled=false
-      - xpack.security.enrollment.enabled=true
+      - "ES_JAVA_OPTS=-Xms1g -Xmx4g"
     ulimits:
       memlock:
         soft: -1
@@ -121,15 +120,11 @@ services:
       - emf_products_example
 
   kibana-service:
-    image: docker.elastic.co/kibana/kibana:8.3.2
+    image: docker.elastic.co/kibana/kibana:7.9.3
     container_name: kibana-container
     environment:
       - "ELASTICSEARCH_URL=http://elasticsearch-container:9200"
       - "SERVER_NAME=127.0.0.1"
-      - bootstrap.memory_lock=true
-      - discovery.type=single-node
-      - cluster.routing.allocation.disk.threshold_enabled=false
-      - xpack.security.enrollment.enabled=true
 
     ports:
       - "5601:5601"
