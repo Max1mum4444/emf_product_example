@@ -1,12 +1,18 @@
 {% extends 'base.html.twig' %}
 
-{% block main %}
+{% block main -%}
+    <div class="row">
+        {%- for product in products -%}
+            <div class="col-md-4">
 
-    {% for product in products %}
-        <h3>{{ product.title }}</h3>
-
-        <pre>
-            {{ dump(product) }}
-        </pre>
-    {% endfor %}
-{% endblock %}
+                <h3>{{ product.title }}</h3>
+                <p>
+                    {{ 'price'|trans }}: {{ product.price }} €
+                </p>
+                <p>
+                    {{ product.description|raw }}
+                </p>
+            </div>
+        {%- endfor -%}
+    </div>
+{%- endblock %}

@@ -68,6 +68,15 @@ CREATE TABLE IF NOT EXISTS `emf_products_example_app`.`emf_product`
 )
     ENGINE = InnoDB;
 
+CREATE TABLE `emf_products_journal`
+(
+    `journal_id`  INT UNSIGNED                      NOT NULL AUTO_INCREMENT,
+    `product_id`  INT UNSIGNED                      DEFAULT NULL,
+    `action_type` enum ('create','update','delete') DEFAULT NULL,
+    `action_time` timestamp NULL                    DEFAULT NULL,
+    PRIMARY KEY (`journal_id`)
+) ENGINE = InnoDB;
+
 
 SET SQL_MODE = @OLD_SQL_MODE;
 SET FOREIGN_KEY_CHECKS = @OLD_FOREIGN_KEY_CHECKS;

@@ -18,3 +18,6 @@ framework:
         pools:
             doctrine.second_level_cache_pool:
                 adapter: cache.app
+            product_cache:
+                adapter: cache.adapter.redis
+                provider: '%env(REDIS_PROVIDER)%'

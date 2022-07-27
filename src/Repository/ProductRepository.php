@@ -5,6 +5,11 @@ namespace App\Repository;
 use App\Entity\Product;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
+use Psr\Cache\InvalidArgumentException;
+use Psr\Log\LoggerInterface;
+use Symfony\Component\HttpClient\HttpClient;
+use Symfony\Contracts\Cache\CacheInterface;
+use Symfony\Contracts\Cache\ItemInterface;
 
 /**
  * @extends ServiceEntityRepository<Product>
@@ -17,7 +22,18 @@ use Doctrine\Persistence\ManagerRegistry;
 class ProductRepository extends ServiceEntityRepository
 {
     public const CACHE_LIFETIME = 3600;
-    public function __construct(ManagerRegistry $registry)
+    private const ENDPOINT = [
+        'list' => '/api/products',
+    ];
+
+    public function __construct(
+        ManagerRegistry $registry,
+        protected LoggerInterface $logger,
+        protected string $apiUrl,
+        protected CacheInterface $cache,
+        protected int $cacheTtl
+//        protected SerializerInterface $serializer
+    )
     {
         parent::__construct($registry, Product::class);
     }
@@ -50,8 +66,26 @@ class ProductRepository extends ServiceEntityRepository
             ->setMaxResults(10)
             ->getQuery()
             ->enableResultCache(static::CACHE_LIFETIME)
-            ->getResult()
-        ;
+            ->getResult();
+    }
+
+    // this should be moved in other app to process output from this app via client and api
+    public function getAllProducts(): array
+    {
+        //this should be in Repository of 2nd app
+        $cacheTtl = $this->cacheTtl;
+
+        try {
+            return $this->cache->get('all_products', function (ItemInterface $item) use ($cacheTtl) {
+                $item->expiresAfter($cacheTtl);
+                $client = HttpClient::create();
+
+                return $client->request('GET', $this->apiUrl.static::ENDPOINT['list'])->toArray();
+            });
+        } catch (InvalidArgumentException $e) {
+            $this->logger->error($e->getMessage());
+            return [];
+        }
     }
 
 //    /**

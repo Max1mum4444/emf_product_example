@@ -44,7 +44,7 @@ services:
     ports:
       - "3306:3306"
     volumes:
-      - ~/docker/mariadb-emf_products_example_app:/var/lib/mysql
+      - ~/docker/emf_products_example/mariadb-emf_products_example_app:/var/lib/mysql
     command: --default-authentication-plugin=mysql_native_password --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci
     restart: always # always restart unless stopped manually
     environment:
@@ -70,5 +70,70 @@ services:
       - "8085:8080"
     depends_on:
       - mariadb-service
+    networks:
+      - emf_products_example
+
+  elasticsearch-service:
+    image: docker.elastic.co/elasticsearch/elasticsearch:8.3.2
+    container_name: elasticsearch-container
+    # restart: on-failure
+    ports:
+      - "9200:9200"
+    environment:
+      - bootstrap.memory_lock=true
+      - discovery.type=single-node
+      - cluster.routing.allocation.disk.threshold_enabled=false
+      - xpack.security.enrollment.enabled=true
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+    volumes:
+      - ~/docker/emf_products_example/elasticsearch:/usr/share/elasticsearch/data
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10k"
+        max-file: "10"
+
+    networks:
+      - emf_products_example
+  logstash:
+    build:
+      context: ./docker/logstash/
+      dockerfile: Dockerfile
+    container_name: logstash-container
+    # restart: on-failure
+    depends_on:
+      - mariadb-service
+      - elasticsearch-service
+    volumes:
+      - ./docker/logstash/pipeline/:/usr/share/logstash/pipeline/
+      - ./docker/logstash/config/logstash.yml:/usr/share/logstash/config/logstash.yml
+      - ./docker/logstash/config/pipelines.yml:/usr/share/logstash/config/pipelines.yml
+      - ./docker/logstash/config/queries/:/usr/share/logstash/config/queries/
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10k"
+        max-file: "10"
+    networks:
+      - emf_products_example
+
+  kibana-service:
+    image: docker.elastic.co/kibana/kibana:8.3.2
+    container_name: kibana-container
+    environment:
+      - "ELASTICSEARCH_URL=http://elasticsearch-container:9200"
+      - "SERVER_NAME=127.0.0.1"
+      - bootstrap.memory_lock=true
+      - discovery.type=single-node
+      - cluster.routing.allocation.disk.threshold_enabled=false
+      - xpack.security.enrollment.enabled=true
+
+    ports:
+      - "5601:5601"
+    depends_on:
+      - elasticsearch-service
     networks:
       - emf_products_example
