@@ -44,7 +44,7 @@ services:
     ports:
       - "3306:3306"
     volumes:
-      - ~/docker/mariadb-emf_products_example_app:/var/lib/mysql
+      - ~/docker/emf_products_example/mariadb-emf_products_example_app:/var/lib/mysql
     command: --default-authentication-plugin=mysql_native_password --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci
     restart: always # always restart unless stopped manually
     environment:
@@ -73,21 +73,62 @@ services:
     networks:
       - emf_products_example
 
-###> doctrine/doctrine-bundle ###
-  database:
-    image: postgres:${POSTGRES_VERSION:-13}-alpine
+  elasticsearch-service:
+    image: docker.elastic.co/elasticsearch/elasticsearch:7.9.3
+    container_name: elasticsearch
+    # restart: on-failure
+    ports:
+      - "9200:9200"
     environment:
-      POSTGRES_DB: ${POSTGRES_DB:-app}
-      # You should definitely change the password in production
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-ChangeMe}
-      POSTGRES_USER: ${POSTGRES_USER:-symfony}
+      - bootstrap.memory_lock=true
+      - discovery.type=single-node
+      - "ES_JAVA_OPTS=-Xms1g -Xmx4g"
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
     volumes:
-      - db-data:/var/lib/postgresql/data:rw
-      # You may use a bind-mounted host directory instead, so that it is harder to accidentally remove the volume and lose all your data!
-      # - ./docker/db/data:/var/lib/postgresql/data:rw
-###< doctrine/doctrine-bundle ###
+      - ~/docker/emf_products_example/elasticsearch:/usr/share/elasticsearch/data
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10k"
+        max-file: "10"
 
-volumes:
-###> doctrine/doctrine-bundle ###
-  db-data:
-###< doctrine/doctrine-bundle ###
+    networks:
+      - emf_products_example
+  logstash:
+    build:
+      context: ./docker/logstash/
+      dockerfile: Dockerfile
+    container_name: logstash-container
+    # restart: on-failure
+    depends_on:
+      - mariadb-service
+      - elasticsearch-service
+    volumes:
+      - ./docker/logstash/pipeline/:/usr/share/logstash/pipeline/
+      - ./docker/logstash/config/logstash.yml:/usr/share/logstash/config/logstash.yml
+      - ./docker/logstash/config/pipelines.yml:/usr/share/logstash/config/pipelines.yml
+      - ./docker/logstash/config/queries/:/usr/share/logstash/config/queries/
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10k"
+        max-file: "10"
+    networks:
+      - emf_products_example
+
+  kibana-service:
+    image: docker.elastic.co/kibana/kibana:7.9.3
+    container_name: kibana-container
+    environment:
+      - "ELASTICSEARCH_URL=http://elasticsearch-container:9200"
+      - "SERVER_NAME=127.0.0.1"
+
+    ports:
+      - "5601:5601"
+    depends_on:
+      - elasticsearch-service
+    networks:
+      - emf_products_example

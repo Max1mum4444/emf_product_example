@@ -4,12 +4,20 @@
 # Put parameters here that don't need to change on each machine where the app is deployed
 # https://symfony.com/doc/current/best_practices.html#use-parameters-for-application-configuration
 parameters:
+    env(API_URL): http://nginx-container
+    env(CACHE_TTL): 60
+    env(REDIS_PROVIDER): redis://redis-container:6379
+    env(API_ITEMS_PER_PAGE): 25
 
 services:
     # default configuration for services in *this* file
     _defaults:
         autowire: true      # Automatically injects dependencies in your services.
         autoconfigure: true # Automatically registers your services as commands, event subscribers, etc.
+        bind:
+            $apiUrl: '%env(API_URL)%'
+            $cacheTtl: '%env(int:CACHE_TTL)%'
+            $apiItemsPerPage: '%env(int:API_ITEMS_PER_PAGE)%'
 
     # makes classes in src/ available to be used as services
     # this creates a service per class whose id is the fully-qualified class name
@@ -29,3 +37,7 @@ services:
             - [ setConfig, [ '%table_prefix%' ] ]
         tags:
             - { name: doctrine.event_listener, event: loadClassMetadata, method: loadClassMetadata }
+
+    App\Elastic\ProductFinder:
+        arguments:
+            $finder: '@fos_elastica.finder.products'

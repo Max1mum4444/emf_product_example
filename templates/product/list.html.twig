@@ -1,12 +1,22 @@
 {% extends 'base.html.twig' %}
 
-{% block main %}
+{% block container -%}
+    {%- for product in products -%}
+        <div class="row">
+            <div class="col-md-3">
+                <img src="{{ product.image1|default( asset('build/images/default-thumbnail.png') ) }}" alt="image" class="product-image-thumbnail" />
+            </div>
+            <div class="col-md-9">
 
-    {% for product in products %}
-        <h3>{{ product.title }}</h3>
-
-        <pre>
-            {{ dump(product) }}
-        </pre>
-    {% endfor %}
-{% endblock %}
+                <h2><a href="{{ path('product_detail', {productId: product.id}) }}">{{ product.title }}</a></h2>
+                <p>
+                    {{ 'price'|trans }}: {{ product.price }} €
+                </p>
+                <p>
+                    {{ (product.description|striptags|length > 250) ? product.description|striptags|slice(0,250) ~ '...' : product.description|striptags }}
+                </p>
+            </div>
+        </div>
+        <hr>
+    {%- endfor -%}
+{%- endblock %}

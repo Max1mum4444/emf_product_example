@@ -1,0 +1,13 @@
+body {
+  font-size: 12px;
+}
+.price {
+  font-weight: bold;
+  font-size: 16px;
+}
+.price-value {
+  font-size: 14px;
+}
+.product-image-thumbnail {
+  max-width: 100%;
+}

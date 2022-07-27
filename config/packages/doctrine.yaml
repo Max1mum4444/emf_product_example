@@ -18,12 +18,12 @@ doctrine:
         result_cache_driver:
             type: pool
             pool: doctrine.second_level_cache_pool
-        second_level_cache:
-            enabled: true
-            region_lifetime: 30
-            region_cache_driver:
-                type: pool
-                pool: doctrine.second_level_cache_pool
+#        second_level_cache:
+#            enabled: true
+#            region_lifetime: 30
+#            region_cache_driver:
+#                type: pool
+#                pool: doctrine.second_level_cache_pool
         mappings:
             App:
                 is_bundle: false

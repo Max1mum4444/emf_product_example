@@ -1,20 +1,47 @@
 <?php
+declare(strict_types=1);
 
 namespace App\Entity;
 
+use ApiPlatform\Core\Annotation\ApiFilter;
+use ApiPlatform\Core\Annotation\ApiResource;
+use ApiPlatform\Core\Bridge\Doctrine\Common\Filter\SearchFilterInterface;
+use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\OrderFilter;
+use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\SearchFilter;
 use App\Repository\ProductRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Validator\Constraints\NotBlank;
 
-#[ORM\Entity(repositoryClass: ProductRepository::class), ORM\Cache()]
+#[
+    ORM\Entity(repositoryClass: ProductRepository::class),
+    ORM\Cache(),
+    ApiResource(
+        collectionOperations: ['get', 'post'],
+        itemOperations: ['get', 'patch', 'put'],
+    ),
+    ApiFilter(
+        SearchFilter::class,
+        properties: [
+            'title' => SearchFilterInterface::STRATEGY_PARTIAL,
+            'description' => SearchFilterInterface::STRATEGY_PARTIAL,
+            'category.id' => SearchFilterInterface::STRATEGY_EXACT,
+        ]
+    ),
+    ApiFilter(
+        OrderFilter::class,
+        properties: ['createdAt']
+    )
+]
 class Product
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
-    #[ORM\Column()]
+    #[ORM\Column(type: Types::INTEGER)]
     private ?int $id = null;
 
     #[ORM\Column(length: 255)]
+    #[NotBlank]
     private ?string $title = null;
 
     #[ORM\Column(type: Types::TEXT, nullable: true)]
@@ -37,6 +64,12 @@ class Product
 
     #[ORM\Column]
     private ?\DateTimeImmutable $updatedAt = null;
+
+    #[
+        ORM\ManyToOne(targetEntity: Category::class, inversedBy: 'products'),
+        Orm\JoinColumn(name: 'emf_category_id', referencedColumnName: 'id')
+    ]
+    private ?Category $category = null;
 
     public function getId(): ?int
     {
@@ -135,6 +168,18 @@ class Product
     public function setUpdatedAt(\DateTimeImmutable $updatedAt): self
     {
         $this->updatedAt = $updatedAt;
+
+        return $this;
+    }
+
+    public function getCategory(): ?Category
+    {
+        return $this->category;
+    }
+
+    public function setCategory(?Category $category): self
+    {
+        $this->category = $category;
 
         return $this;
     }

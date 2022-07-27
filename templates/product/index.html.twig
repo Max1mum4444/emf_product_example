@@ -1,0 +1,18 @@
+{% extends 'base.html.twig' %}
+
+{% block container -%}
+    <div class="row">
+        {%- for product in products|slice(0, 3) -%}
+            <div class="col-md-4">
+
+                <h2><a href="{{ path('product_detail', {productId: product.id}) }}">{{ product.title }}</a></h2>
+                <p>
+                    <span class="price">{{ 'price'|trans }}:</span> <span class="price-value">{{ product.price }} &euro;</span>
+                </p>
+                <p>
+                    {{ (product.description|striptags|length > 250) ? product.description|striptags|slice(0,250) ~ '...' : product.description|striptags }}
+                </p>
+            </div>
+        {%- endfor -%}
+    </div>
+{%- endblock %}

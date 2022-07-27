@@ -1,0 +1,16 @@
+{% extends 'base.html.twig' %}
+
+{% block container -%}
+    <div class="row">
+        <div class="col-md-12">
+
+            <h2>{{ product.title }}</h2>
+            <p>
+                <span class="price">{{ 'price'|trans }}:</span> <span class="price-value">{{ product.price }} &euro;</span>
+            </p>
+            <p>
+                {{ product.description|raw }}
+            </p>
+        </div>
+    </div>
+{%- endblock %}
