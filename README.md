@@ -43,4 +43,8 @@ add to /etc/hosts:
 127.0.0.1 emf-products.localhost
 ```
 
-run sql db-schema.sql db-schema-test.sql and db-data.sql in mysql
+run sqls: db-schema.sql db-schema-test.sql and db-data.sql from db folder in root of this project in mysql
+and then run again for logstash to find correct tables:
+```
+docker-compose down -v && docker-compose up -d --build
+```
