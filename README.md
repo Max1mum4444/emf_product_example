@@ -37,3 +37,10 @@ composer install
 yarn install
 yarn build
 ```
+add to /etc/hosts:
+
+```
+127.0.0.1 emf-products.localhost
+```
+
+run sql db-schema.sql db-schema-test.sql and db-data.sql in mysql
