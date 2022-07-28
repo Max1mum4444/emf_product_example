@@ -29,6 +29,8 @@ http://emf-products.localhost/products/1
 
 http://emf-products.localhost/products?search=nechaj
 
+http://emf-products.localhost/api
+
 ## RUN and install
 ```console
 docker-compose up -d --build
