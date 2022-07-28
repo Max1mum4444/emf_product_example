@@ -4,6 +4,9 @@ It should be divided in 2 apps to use it as separate microservices
 ## Logger
 TODO configure logger - I am currently using LoggerInterface and logging exception in controller but it would be good to write it somewhere
 
+## MediaController
+Only for this purpose. Media should be served by nginx directly
+
 ## Normalizer - ProductNormalizer
 TODO make processing data from api and hydrate Entities
 in new app to process data coming from api via normalizer in its own repository where would be client calling
